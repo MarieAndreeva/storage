@@ -106,3 +106,6 @@ setTimeout(() => {
         .then((length) => console.log(length))
         .catch((err) => console.log(err));
 }, 20);
+setTimeout(() => {
+    console.log(nativeCache);
+}, 50);

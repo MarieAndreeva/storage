@@ -80,7 +80,7 @@ export class StorageNative implements IStorage {
         this._data = Object.create(null);
     }
 
-    public get = (key: string) => {
+    public get = (key: string): Promise<any> => {
        return new Promise((resolve, reject) => {
            setTimeout(() => {
             resolve(this._data[key])
@@ -126,3 +126,8 @@ setTimeout(() => {
       .then((length) => console.log(length))
       .catch((err) => console.log(err));
 }, 20);
+
+
+setTimeout(() => {
+    console.log(nativeCache);
+}, 50);
