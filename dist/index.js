@@ -19,6 +19,7 @@ class Storage {
                     if (err) {
                         reject(err);
                     }
+                    resolve(smth);
                 });
             });
         };
@@ -64,7 +65,7 @@ cache.set('myFirstKey', 'myFirstValue')
 class StorageNative {
     constructor() {
         this.get = (key) => {
-            return new Promise((resolve, reject) => {
+            return Promise.resolve((resolve) => {
                 setTimeout(() => {
                     resolve(this._data[key]);
                 }, 0);
@@ -74,6 +75,7 @@ class StorageNative {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     this._data[key] = value;
+                    resolve('OK');
                     if (ttl) {
                         setTimeout(() => {
                             delete this._data[key];
