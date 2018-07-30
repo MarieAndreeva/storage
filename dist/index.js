@@ -43,16 +43,66 @@ class Storage {
     }
 }
 exports.Storage = Storage;
+/*
 const cache = new Storage({ port: 6968, host: 'localhost' });
+
 cache.count()
-    .then(len => { console.log(len); })
-    .catch(err => { console.log(err); });
+  .then(len => { console.log(len); })
+  .catch(err => { console.log(err) });
+
 cache.get('emptyKey')
-    .then(value => console.log(value))
-    .catch(error => console.log(error));
+  .then(value => console.log(value))
+  .catch(error => console.log(error));
+
 cache.set('myFirstKey', 'myFirstValue')
-    .then(() => {
-    return cache.get('myFirstKey');
-})
-    .then(value => console.log(value))
-    .catch(error => console.log(error));
+  .then(() => {
+      return cache.get('myFirstKey');
+  })
+  .then(value => console.log(value))
+  .catch(error => console.log(error));
+*/
+class StorageNative {
+    constructor() {
+        this.get = (key) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    resolve(this._data[key]);
+                }, 0);
+            });
+        };
+        this.set = (key, value, ttl) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    this._data[key] = value;
+                    if (ttl) {
+                        setTimeout(() => {
+                            delete this._data[key];
+                        }, ttl);
+                    }
+                }, 0);
+            });
+        };
+        this.count = () => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    const length = Object.keys(this._data).length;
+                    resolve(length);
+                }, 0);
+            });
+        };
+        this._data = Object.create(null);
+    }
+}
+exports.StorageNative = StorageNative;
+const nativeCache = new StorageNative();
+nativeCache.set('firstKey', 'firstValue');
+nativeCache.set('secondKey', 'secondValue', 5);
+nativeCache.set('thridKey', 'thirdValue');
+nativeCache.count()
+    .then((length) => console.log(length))
+    .catch((err) => console.log(err));
+setTimeout(() => {
+    nativeCache.count()
+        .then((length) => console.log(length))
+        .catch((err) => console.log(err));
+}, 20);

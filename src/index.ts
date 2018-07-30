@@ -1,6 +1,8 @@
 import { createClient, RedisClient } from 'redis';
 import { IStorage } from './interfaces/storage.interface';
 import { IOptions } from './interfaces/config.interface';
+import { rejects } from 'assert';
+import { resolve } from 'dns';
 
 export class Storage implements IStorage {
     private _client: RedisClient;
@@ -52,7 +54,7 @@ export class Storage implements IStorage {
     };
 }
 
-
+/*
 const cache = new Storage({ port: 6968, host: 'localhost' });
 
 cache.count()
@@ -69,3 +71,58 @@ cache.set('myFirstKey', 'myFirstValue')
   })
   .then(value => console.log(value))
   .catch(error => console.log(error));
+*/
+
+export class StorageNative implements IStorage {
+    private _data: Object;
+
+    constructor() {
+        this._data = Object.create(null);
+    }
+
+    public get = (key: string) => {
+       return new Promise((resolve, reject) => {
+           setTimeout(() => {
+            resolve(this._data[key])
+           }, 0);
+       }); 
+    };
+
+    public set = (key: string, value: any, ttl?: number): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                this._data[key] = value;
+                if (ttl) {
+                    setTimeout(() => {
+                        delete this._data[key];
+                    }, ttl);
+                }
+            }, 0);
+        });
+    };
+
+    public count = (): Promise<number> => {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                const length = Object.keys(this._data).length;
+                resolve(length);
+            }, 0);
+        });
+    };
+}
+
+const nativeCache = new StorageNative();
+
+nativeCache.set('firstKey', 'firstValue');
+nativeCache.set('secondKey', 'secondValue', 5);
+nativeCache.set('thridKey', 'thirdValue');
+
+nativeCache.count()
+  .then((length) => console.log(length))
+  .catch((err) => console.log(err));
+
+setTimeout(() => {
+    nativeCache.count()
+      .then((length) => console.log(length))
+      .catch((err) => console.log(err));
+}, 20);
